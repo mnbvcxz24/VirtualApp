@@ -30,6 +30,7 @@ import com.lody.virtual.client.core.VirtualCore;
 
 import io.virtualapp.R;
 import io.virtualapp.VCommends;
+import io.virtualapp.diagnostics.CloneHubDebugLog;
 import io.virtualapp.home.adapters.HomeAppAdapter;
 import io.virtualapp.home.models.AppData;
 import io.virtualapp.home.models.PackageAppData;
@@ -41,7 +42,6 @@ public class NewHomeActivity extends AppCompatActivity {
     private static final String SHOW_DOZE_ALERT_KEY = "SHOW_DOZE_ALERT_KEY";
     private static final String TAG = NewHomeActivity.class.getSimpleName();
     private Handler mUiHandler;
-
     private RecyclerView mRecyclerView;
     private ProgressBar mProgressBar;
     private View mEmptyView;
@@ -59,14 +59,12 @@ public class NewHomeActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        CloneHubDebugLog.log(this, "NewHomeActivity.onCreate");
         setContentView(R.layout.activity_home);
         mUiHandler = new Handler(getMainLooper());
 
-        // Toolbar — dark gray with white text
         Toolbar toolbar = findViewById(R.id.home_toolbar);
         setSupportActionBar(toolbar);
-
-        // Views
         mRecyclerView = findViewById(R.id.home_recycler_view);
         mProgressBar = findViewById(R.id.home_progress_bar);
         mEmptyView = findViewById(R.id.home_empty_view);
@@ -89,10 +87,15 @@ public class NewHomeActivity extends AppCompatActivity {
                     if (!appData.isLoading) {
                         appData.isLoading = true;
                         mAdapter.notifyItemChanged(position);
+                        CloneHubDebugLog.log(NewHomeActivity.this, "Home app clicked package="
+                                + appData.packageName + " name=" + appData.name + " position=" + position);
                         try {
-                            LoadingActivity.launch(NewHomeActivity.this, appData.packageName, 0);
-                        } catch (Throwable e) {
-                            e.printStackTrace();
+                            boolean launched = LoadingActivity.launch(NewHomeActivity.this, appData.packageName, 0);
+                            CloneHubDebugLog.log(NewHomeActivity.this, "LoadingActivity.launch result=" + launched
+                                    + " package=" + appData.packageName);
+                        } catch (Throwable error) {
+                            CloneHubDebugLog.log(NewHomeActivity.this, "Home app launch threw for " + appData.packageName, error);
+                            Log.e(TAG, "Unable to launch virtual app", error);
                         }
                         mUiHandler.postDelayed(() -> {
                             appData.isLoading = false;
@@ -104,30 +107,20 @@ public class NewHomeActivity extends AppCompatActivity {
 
             @Override
             public void onAppLongClick(AppData data, int position) {
-                if (data instanceof PackageAppData) {
-                    showAppPopupMenu((PackageAppData) data, position);
-                }
+                if (data instanceof PackageAppData) showAppPopupMenu((PackageAppData) data, position);
             }
         });
 
-        // FAB
         mFab.setOnClickListener(v -> ListAppActivity.gotoListApp(this));
-
-        // FAB show/hide on scroll
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (dy > 10) {
-                    mFab.hide();
-                } else if (dy < -10) {
-                    mFab.show();
-                }
+                if (dy > 10) mFab.hide();
+                else if (dy < -10) mFab.show();
             }
         });
-
         mRepository = new AppRepository(this);
     }
-
 
     private void showAppPopupMenu(PackageAppData appData, int position) {
         View itemView = mRecyclerView.findViewHolderForAdapterPosition(position) != null
@@ -137,15 +130,10 @@ public class NewHomeActivity extends AppCompatActivity {
         popup.getMenuInflater().inflate(R.menu.app_popup_menu, popup.getMenu());
         popup.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.app_clear) {
-                confirmClearData(appData);
-            } else if (id == R.id.app_stop) {
-                confirmStopApp(appData);
-            } else if (id == R.id.app_remove) {
-                confirmUninstall(appData, position);
-            } else if (id == R.id.app_shortcut) {
-                Toast.makeText(this, R.string.create_shortcut_success, Toast.LENGTH_SHORT).show();
-            }
+            if (id == R.id.app_clear) confirmClearData(appData);
+            else if (id == R.id.app_stop) confirmStopApp(appData);
+            else if (id == R.id.app_remove) confirmUninstall(appData, position);
+            else if (id == R.id.app_shortcut) Toast.makeText(this, R.string.create_shortcut_success, Toast.LENGTH_SHORT).show();
             return true;
         });
         popup.show();
@@ -158,8 +146,10 @@ public class NewHomeActivity extends AppCompatActivity {
                 .setPositiveButton(android.R.string.yes, (d, w) -> {
                     try {
                         VirtualCore.get().clearPackage(appData.packageName);
+                        CloneHubDebugLog.log(this, "Cleared virtual app data for " + appData.packageName);
                         Toast.makeText(this, R.string.reboot_tips_1, Toast.LENGTH_SHORT).show();
                     } catch (Throwable e) {
+                        CloneHubDebugLog.log(this, "Failed clearing virtual app data for " + appData.packageName, e);
                         Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -174,8 +164,10 @@ public class NewHomeActivity extends AppCompatActivity {
                 .setPositiveButton(android.R.string.yes, (d, w) -> {
                     try {
                         VirtualCore.get().killApp(appData.packageName, 0);
+                        CloneHubDebugLog.log(this, "Force-stopped virtual app " + appData.packageName);
                         Toast.makeText(this, R.string.reboot_tips_1, Toast.LENGTH_SHORT).show();
                     } catch (Throwable e) {
+                        CloneHubDebugLog.log(this, "Failed force-stopping " + appData.packageName, e);
                         Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -190,10 +182,12 @@ public class NewHomeActivity extends AppCompatActivity {
                 .setPositiveButton(android.R.string.yes, (d, w) -> {
                     try {
                         VirtualCore.get().uninstallPackage(appData.packageName);
+                        CloneHubDebugLog.log(this, "Uninstalled virtual app " + appData.packageName);
                         mAdapter.getData().remove(position);
                         mAdapter.notifyItemRemoved(position);
                         updateEmptyView();
                     } catch (Throwable e) {
+                        CloneHubDebugLog.log(this, "Failed uninstalling virtual app " + appData.packageName, e);
                         Toast.makeText(this, "Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -207,9 +201,11 @@ public class NewHomeActivity extends AppCompatActivity {
         mRepository.getVirtualApps().done(apps -> runOnUiThread(() -> {
             mProgressBar.setVisibility(View.GONE);
             mAdapter.setData(apps);
+            CloneHubDebugLog.log(this, "Loaded virtual app list count=" + apps.size());
             updateEmptyView();
         })).fail(err -> runOnUiThread(() -> {
             mProgressBar.setVisibility(View.GONE);
+            CloneHubDebugLog.log(this, "Failed to load virtual apps", (Throwable) err);
             Log.e(TAG, "Failed to load virtual apps", (Throwable) err);
             updateEmptyView();
         }));
@@ -241,7 +237,11 @@ public class NewHomeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.main_setting) {
+        if (id == R.id.main_debug_log) {
+            CloneHubDebugLog.log(this, "User requested debug log export");
+            CloneHubDebugLog.share(this);
+            return true;
+        } else if (id == R.id.main_setting) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         } else if (id == R.id.main_reboot) {
@@ -249,6 +249,7 @@ public class NewHomeActivity extends AppCompatActivity {
                     .setTitle(R.string.settings_reboot_title)
                     .setMessage(R.string.settings_reboot_content)
                     .setPositiveButton(android.R.string.yes, (d, w) -> {
+                        CloneHubDebugLog.log(this, "User requested VirtualCore.killAllApps");
                         VirtualCore.get().killAllApps();
                         Toast.makeText(this, R.string.reboot_tips_1, Toast.LENGTH_SHORT).show();
                     })
@@ -262,44 +263,33 @@ public class NewHomeActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == VCommends.REQUEST_SELECT_APP) {
-            loadApps();
-        }
+        if (requestCode == VCommends.REQUEST_SELECT_APP) loadApps();
     }
 
     public void startVirtualActivity(Intent intent, Bundle options, int usedId) {
         String packageName = intent.getPackage();
         if (TextUtils.isEmpty(packageName)) {
             ComponentName component = intent.getComponent();
-            if (component != null) {
-                packageName = component.getPackageName();
-            }
+            if (component != null) packageName = component.getPackageName();
         }
         if (packageName == null) {
             try {
                 startActivity(intent);
                 return;
             } catch (Throwable ignored) {
+                CloneHubDebugLog.log(this, "Direct external activity launch failed", ignored);
             }
         }
         boolean result = LoadingActivity.launch(this, packageName, usedId);
-        if (!result) {
-            throw new ActivityNotFoundException("can not launch activity for: " + intent);
-        }
+        if (!result) throw new ActivityNotFoundException("can not launch activity for: " + intent);
     }
 
     private void alertForDoze() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return;
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-        if (powerManager == null) {
-            return;
-        }
+        if (powerManager == null) return;
         boolean showAlert = PreferenceManager.getDefaultSharedPreferences(this).getBoolean(SHOW_DOZE_ALERT_KEY, true);
-        if (!showAlert) {
-            return;
-        }
+        if (!showAlert) return;
         if (!powerManager.isIgnoringBatteryOptimizations(getPackageName())) {
             mUiHandler.postDelayed(() -> {
                 try {
