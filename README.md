@@ -12,7 +12,7 @@ An Android virtualization engine that runs cloned apps in an isolated sandbox wi
 - **App Cloning** — Run multiple instances of supported apps inside the virtual space
 - **Android 5.0–14 Support** — Tested and working on Android 14 (API 34); Android 15 compatibility is not yet established
 - **Xposed Modules** — Load Xposed modules without root (auto-disabled on Android 14 due to ART changes)
-- **32-bit & 64-bit** — Builds for `arm64-v8a` and `armeabi-v7a`
+- **32-bit & 64-bit** — Builds for `arm64-v8a`, `armeabi-v7a`, and `x86_64`
 - **No Root Required** — Virtualization runs within the CloneHub host APK
 - **IO Redirection** — Transparent file path remapping for cloned apps
 - **UID Virtualization** — Each cloned app gets its own virtual identity
@@ -62,9 +62,10 @@ The `:shell` application module is not included in the build. Gradle builds only
 Output in `app/build/outputs/apk/debug/`:
 
 ```
-VirtualApp-1.0.0-arm64-v8a.apk
-VirtualApp-1.0.0-armeabi-v7a.apk
-VirtualApp-1.0.0-universal.apk
+CloneHub-0.2.2-arm64-v8a.apk
+CloneHub-0.2.2-armeabi-v7a.apk
+CloneHub-0.2.2-x86_64.apk
+CloneHub-0.2.2-universal.apk
 ```
 
 Install the universal APK or the ABI-specific APK matching your device. On the CloneHub home screen, tap the cloned app to launch it.
