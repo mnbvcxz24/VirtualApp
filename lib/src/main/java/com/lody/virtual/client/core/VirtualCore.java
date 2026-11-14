@@ -201,17 +201,28 @@ public final class VirtualCore {
                 }
             }
 
+            Log.i("CloneHubStartup", "startup: configure authorities");
             VASettings.STUB_CP_AUTHORITY = context.getPackageName() + "." + VASettings.STUB_DEF_AUTHORITY;
             ServiceManagerNative.SERVICE_CP_AUTH = context.getPackageName() + "." + ServiceManagerNative.SERVICE_DEF_AUTH;
             this.context = context;
+            Log.i("CloneHubStartup", "startup: get ActivityThread");
             mainThread = ActivityThread.currentActivityThread.call();
+            Log.i("CloneHubStartup", "startup: resolve host package info");
             unHookPackageManager = context.getPackageManager();
             hostPkgInfo = unHookPackageManager.getPackageInfo(context.getPackageName(), PackageManager.GET_PROVIDERS);
+            Log.i("CloneHubStartup", "startup: detect process type");
             detectProcessType();
+            Log.i("CloneHubStartup", "startup: process=" + processName + " type=" + processType);
             InvocationStubManager invocationStubManager = InvocationStubManager.getInstance();
+            Log.i("CloneHubStartup", "startup: InvocationStubManager.init begin");
             invocationStubManager.init();
+            Log.i("CloneHubStartup", "startup: InvocationStubManager.init complete");
+            Log.i("CloneHubStartup", "startup: InvocationStubManager.injectAll begin");
             invocationStubManager.injectAll();
+            Log.i("CloneHubStartup", "startup: InvocationStubManager.injectAll complete");
+            Log.i("CloneHubStartup", "startup: ContextFixer.fixContext begin");
             ContextFixer.fixContext(context);
+            Log.i("CloneHubStartup", "startup: ContextFixer.fixContext complete");
             isStartUp = true;
             if (initLock != null) {
                 initLock.open();
