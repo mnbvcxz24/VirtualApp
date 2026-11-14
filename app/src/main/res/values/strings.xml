@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">VirtualApp</string>
-    <string name="vxp">VirtualApp</string>
+    <string name="app_name">CloneHub</string>
+    <string name="vxp">CloneHub</string>
     <string name="wait">Please wait…</string>
     <string name="desktop">Desktop</string>
     <string name="add_app">Add App</string>
@@ -35,7 +35,7 @@
     <string name="install_success_tips">The Xposed module will not take effect until you enable it in XposedInstaller\'s module setting.</string>
     <string name="install_fail_tips">Install %1$s failed: %2$s</string>
     <string name="copy_right" translatable="false" >Copyright © %1$d</string>
-    <string name="about_page_description">VirtualApp is an app cloning engine that lets you run multiple instances of any app in an isolated sandbox. Supports Android 5.0 through 14.</string>
+    <string name="about_page_description">CloneHub is an app cloning manager that lets you run multiple instances of any app in an isolated sandbox. Supports Android 5.0 through 14.</string>
     <string name="about_feedback_qq_title">QQ Group (Click to copy group number)</string>
     <string name="about_feedback_wechat_title">WeChat Group (Click to copy)</string>
     <string name="about_feedback_tips">Group number has been copied to clipboard!</string>
@@ -63,7 +63,7 @@
     <string name="thanks_dialog_title">Credits</string>
     <string name="thanks_dialog_content" >Thanks Cheney for providing the awesome icon, and thank you Pei, Peggy, and too many others to list, for your hard work. Thanks for the ideas and suggestions you all provided, and special thanks to YingLin for taking the time to help me achieve my design :)</string>
     <string name="alert_for_doze_mode_title">Tips</string>
-    <string name="alert_for_doze_mode_content">Please allow VirtualApp to run in the background, otherwise you may not receive notifications from some virtual apps.</string>
+    <string name="alert_for_doze_mode_content">Please allow CloneHub to run in the background, otherwise you may not receive notifications from some virtual apps.</string>
     <string name="alert_for_doze_mode_yes">Allow</string>
     <string name="alert_for_doze_mode_no">Deny</string>
     <string name="about_faq_title">FAQ</string>
@@ -78,7 +78,7 @@
     <string name="add_app_loading_tips">Parsing package for %1$s…</string>
     <string name="add_app_installing_tips">Installing %1$s…</string>
     <string name="add_app_loading_complete">%1$s successfully installed. </string>
-    <string name="list_app_activity_install">Add to VirtualApp</string>
+    <string name="list_app_activity_install">Add to CloneHub</string>
     <string name="settings_about_text">About</string>
     <string name="settings_task_manage_text">Manage Tasks</string>
     <string name="settings_app_manage_text">Manage Apps</string>
@@ -87,7 +87,7 @@
     <string name="app_manage_repair">Repair</string>
     <string name="settings_title">Settings</string>
     <string name="task_manage_uninstall">Kill Process</string>
-    <string name="settings_reboot_title">Reboot VirtualApp</string>
+    <string name="settings_reboot_title">Reboot CloneHub</string>
     <string name="settings_reboot_content">This will kill all apps currently running in VirtualApp. Reboot anyway?</string>
     <string name="check_update">Check Update</string>
     <string name="version_is_latest">Latest version is installed.</string>
@@ -111,7 +111,7 @@
     <string name="app_manage_redirect_desc">Storage Redirection redirects an application\'s access from the real SD card to a virtual SD card, which will prevent certain apps from creating directories in your real SD card; however, after the storage redirection is enabled, the application can no longer access the real SD card. Please select it when prompted.</string>
     <string name="app_manage_redirect_on_confirm">Open, Confirm</string>
     <string name="app_manage_redirect_off_confirm">Close, Confirm</string>
-    <string name="shared_to_vxp">Share to App in VirtualApp</string>
+    <string name="shared_to_vxp">Share to App in CloneHub</string>
     <string name="shared_to_vxp_failed">Share failed, please try again.</string>
     <string name="app_installer_label">Add to VirtualApp</string>
     <string name="install_complete">DONE</string>

@@ -26,7 +26,7 @@
 
     <uses-sdk tools:overrideLibrary="android.support.dynamicanimation" />
 
-    <permission android:name="io.va.exposed64.permission.LAUNCH_VIRTUAL_APP" android:protectionLevel="signature" />
+    <permission android:name="com.moldyhub.clonehub.permission.LAUNCH_VIRTUAL_APP" android:protectionLevel="signature" />
 
     <application
         android:name=".XApp"
@@ -64,7 +64,7 @@
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:permission="io.va.exposed64.permission.LAUNCH_VIRTUAL_APP" />
+            android:permission="com.moldyhub.clonehub.permission.LAUNCH_VIRTUAL_APP" />
 
         <activity
             android:name=".home.ListAppActivity"
