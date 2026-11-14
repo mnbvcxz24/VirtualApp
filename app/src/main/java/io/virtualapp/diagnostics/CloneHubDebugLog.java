@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.io.File;
@@ -121,7 +122,7 @@ public final class CloneHubDebugLog {
             return "Downloads/CloneHub/" + FILE_NAME;
         }
 
-        if (context.checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != android.content.pm.PackageManager.PERMISSION_GRANTED) {
             throw new SecurityException("WRITE_EXTERNAL_STORAGE permission is required.");
         }
