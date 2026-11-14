@@ -8,11 +8,12 @@ An Android virtualization engine that runs cloned apps in an isolated sandbox wi
 
 ## Features
 
-- **App Cloning** — Run multiple instances of any app simultaneously
-- **Android 5.0–14 Support** — Tested and working on Android 14 (API 34)
+- **Single host app** — Install CloneHub once; the launcher and virtualization engine are included in the same APK. No separate shell APK is required.
+- **App Cloning** — Run multiple instances of supported apps inside the virtual space
+- **Android 5.0–14 Support** — Tested and working on Android 14 (API 34); Android 15 compatibility is not yet established
 - **Xposed Modules** — Load Xposed modules without root (auto-disabled on Android 14 due to ART changes)
 - **32-bit & 64-bit** — Builds for `arm64-v8a` and `armeabi-v7a`
-- **No Root Required** — Everything runs within a single host APK
+- **No Root Required** — Virtualization runs within the CloneHub host APK
 - **IO Redirection** — Transparent file path remapping for cloned apps
 - **UID Virtualization** — Each cloned app gets its own virtual identity
 - **Search** — Find apps quickly when cloning with built-in search
@@ -53,37 +54,20 @@ See [docs/FIXES.md](docs/FIXES.md) for complete technical details.
 ### Build
 
 ```bash
-# Clone the repo
-git clone <repo-url> VirtualApp
-cd VirtualApp
-
-# Build debug APK (produces per-ABI splits + universal)
 ./gradlew assembleDebug
 ```
 
+The `:shell` application module is not included in the build. Gradle builds only the CloneHub host app (`:app`) and the engine library (`:lib`), so you install one CloneHub app rather than a separate shell package.
+
 Output in `app/build/outputs/apk/debug/`:
+
 ```
 VirtualApp-1.0.0-arm64-v8a.apk
 VirtualApp-1.0.0-armeabi-v7a.apk
 VirtualApp-1.0.0-universal.apk
 ```
 
-### Install & Run
-
-```bash
-# Install arm64 split (recommended for modern devices)
-adb install -r app/build/outputs/apk/debug/VirtualApp-1.0.0-arm64-v8a.apk
-
-# Install armeabi-v7a for 32-bit devices
-adb install -r app/build/outputs/apk/debug/VirtualApp-1.0.0-armeabi-v7a.apk
-
-# Or universal (works on all architectures)
-adb install -r app/build/outputs/apk/debug/VirtualApp-1.0.0-universal.apk
-
-adb shell monkey -p io.va.exposed64 -c android.intent.category.LAUNCHER 1
-```
-
-See [docs/BUILD.md](docs/BUILD.md) for detailed build instructions.
+Install the universal APK or the ABI-specific APK matching your device. On the CloneHub home screen, tap the cloned app to launch it.
 
 ---
 
@@ -91,7 +75,7 @@ See [docs/BUILD.md](docs/BUILD.md) for detailed build instructions.
 
 ```
 VirtualApp/
-├── app/           # Host application (UI, Activities, XApp)
+├── app/           # CloneHub host application (UI, Activities, XApp)
 ├── lib/           # Core virtualization engine
 │   ├── src/main/java/   # Java engine (hooks, services, proxies)
 │   └── src/main/jni/    # Native code (libva++.so)
@@ -110,18 +94,6 @@ VirtualApp/
 ```
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for system design details.
-
----
-
-## Documentation
-
-| Document | Description |
-|----------|-------------|
-| [docs/FIXES.md](docs/FIXES.md) | Every Android 14 fix with root cause analysis, code changes, and verification |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture, module structure, data flow diagrams |
-| [docs/BUILD.md](docs/BUILD.md) | Build prerequisites, steps, variants, deployment, troubleshooting |
-| [docs/CHANGELOG.md](docs/CHANGELOG.md) | Version history and change log |
-| [docs/KNOWN-ISSUES.md](docs/KNOWN-ISSUES.md) | Known issues, limitations, workarounds |
 
 ---
 
@@ -148,6 +120,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for system design details.
 
 ## Known Issues
 
+- **Android 15 (API 35)** has not been validated by this fork; some virtualized apps may fail during startup
 - **Xposed modules** do not work on Android 14 (Epic/SandHook incompatible with ART changes)
 - **Fake signatures** used when certificate parsing fails (some apps may detect tampering)
 - **SELinux denials** for certain vendor properties (non-fatal)
@@ -176,7 +149,7 @@ See [docs/KNOWN-ISSUES.md](docs/KNOWN-ISSUES.md) for the full list.
 2. Read [docs/BUILD.md](docs/BUILD.md) to set up your environment
 3. Check [docs/KNOWN-ISSUES.md](docs/KNOWN-ISSUES.md) for things that need fixing
 4. When modifying native code, always delete `lib/build` before rebuilding
-5. Test on a real Android 14 device — emulators may not reproduce all issues
+5. Test on a real Android device — emulator results may differ
 
 ---
 
