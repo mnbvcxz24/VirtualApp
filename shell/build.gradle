@@ -1,0 +1,20 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdk 34
+    defaultConfig {
+        applicationId "com.moldyhub.clonehub.shell.roblox"
+        minSdkVersion 23
+        targetSdkVersion 33
+        versionCode 1
+        versionName "0.1.0"
+        // Fixed target for the first end-to-end shell prototype.
+        // The next iteration will generate these values per selected clone.
+        buildConfigField "String", "TARGET_PACKAGE", "\"com.roblox.client\""
+        buildConfigField "int", "TARGET_USER_ID", "0"
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
