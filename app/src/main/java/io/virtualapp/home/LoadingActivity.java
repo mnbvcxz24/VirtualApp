@@ -73,7 +73,8 @@ public class LoadingActivity extends VActivity {
             return false;
         } catch (Throwable error) {
             CloneHubDebugLog.log(context, "LoadingActivity.launch failed for " + packageName, error);
-            throw error;
+            if (error instanceof RuntimeException) throw (RuntimeException) error;
+            throw new RuntimeException(error);
         }
     }
 
