@@ -13,6 +13,9 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -41,6 +44,7 @@ public class NewHomeActivity extends AppCompatActivity {
 
     private static final String SHOW_DOZE_ALERT_KEY = "SHOW_DOZE_ALERT_KEY";
     private static final String TAG = NewHomeActivity.class.getSimpleName();
+    private static final int REQUEST_EXPORT_DEBUG_PERMISSION = 731;
     private Handler mUiHandler;
     private RecyclerView mRecyclerView;
     private ProgressBar mProgressBar;
@@ -238,8 +242,7 @@ public class NewHomeActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.main_debug_log) {
-            CloneHubDebugLog.log(this, "User requested debug log export");
-            CloneHubDebugLog.share(this);
+            exportDebugLog();
             return true;
         } else if (id == R.id.main_setting) {
             startActivity(new Intent(this, SettingsActivity.class));
@@ -258,6 +261,41 @@ public class NewHomeActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void exportDebugLog() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+                && ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_EXPORT_DEBUG_PERMISSION);
+            return;
+        }
+        saveDebugLogToDownloads();
+    }
+
+    private void saveDebugLogToDownloads() {
+        try {
+            String path = CloneHubDebugLog.exportToDownloads(this);
+            Toast.makeText(this, "Debug TXT saved: " + path, Toast.LENGTH_LONG).show();
+            CloneHubDebugLog.log(this, "User exported debug report to " + path);
+        } catch (Throwable error) {
+            CloneHubDebugLog.log(this, "Failed to export debug TXT to Downloads", error);
+            Toast.makeText(this, "Could not save debug TXT: " + error.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_EXPORT_DEBUG_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                saveDebugLogToDownloads();
+            } else {
+                Toast.makeText(this, "Storage permission is needed to save the TXT file.", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override
