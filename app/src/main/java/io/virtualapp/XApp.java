@@ -14,20 +14,12 @@ import java.io.IOException;
 import io.virtualapp.delegate.MyVirtualInitializer;
 import io.virtualapp.diagnostics.CloneHubDebugLog;
 
-/**
- * @author Lody
- */
 public class XApp extends Application {
-
     private static final String TAG = "XApp";
-
     public static final String XPOSED_INSTALLER_PACKAGE = "de.robv.android.xposed.installer";
-
     private static XApp gApp;
 
-    public static XApp getApp() {
-        return gApp;
-    }
+    public static XApp getApp() { return gApp; }
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -40,12 +32,10 @@ public class XApp extends Application {
             CloneHubDebugLog.log(base, "VirtualCore.startup begin");
             VirtualCore.get().startup(base);
             CloneHubDebugLog.log(base, "VirtualCore.startup complete");
-        } catch (Throwable e) {
-            CloneHubDebugLog.log(base, "VirtualCore.startup failed", e);
-            e.printStackTrace();
+        } catch (Throwable error) {
+            CloneHubDebugLog.log(base, "VirtualCore.startup failed", error);
+            error.printStackTrace();
         }
-        // On Android 14+ (API 34+), auto-disable Xposed on first launch since
-        // Epic/SandHook may be incompatible. Users can re-enable from Settings.
         if (Build.VERSION.SDK_INT >= 34) {
             try {
                 File disableXposedFile = base.getFileStreamPath(".disable_xposed");
@@ -57,9 +47,9 @@ public class XApp extends Application {
                     }
                     xposedApiChecked.createNewFile();
                 }
-            } catch (IOException e) {
-                CloneHubDebugLog.log(base, "Failed to auto-configure Xposed settings", e);
-                Log.w(TAG, "Failed to auto-configure Xposed settings", e);
+            } catch (IOException error) {
+                CloneHubDebugLog.log(base, "Failed to auto-configure Xposed settings", error);
+                Log.w(TAG, "Failed to auto-configure Xposed settings", error);
             }
         }
     }
@@ -85,7 +75,7 @@ public class XApp extends Application {
             CloneHubDebugLog.log(this, "VirtualCore.initialize complete");
         } catch (Throwable error) {
             CloneHubDebugLog.log(this, "VirtualCore.initialize failed", error);
-            throw error;
+            throw new RuntimeException(error);
         }
     }
 }
