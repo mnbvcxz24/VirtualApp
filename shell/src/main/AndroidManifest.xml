@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="io.va.exposed64.permission.LAUNCH_VIRTUAL_APP" />
+    <uses-permission android:name="com.moldyhub.clonehub.permission.LAUNCH_VIRTUAL_APP" />
     <application
         android:allowBackup="false"
         android:icon="@android:drawable/sym_def_app_icon"
