@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="menu_export_debug_log">Export debug log</string>
+    <string name="menu_export_debug_log">Export debug TXT</string>
 </resources>
