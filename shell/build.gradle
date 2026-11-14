@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
+    namespace 'com.moldyhub.clonehub.shell'
     compileSdk 34
     defaultConfig {
         applicationId "com.moldyhub.clonehub.shell.roblox"
