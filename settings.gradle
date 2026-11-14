@@ -1,2 +1,2 @@
-include ':lib', ':app', ':shell'
+include ':lib', ':app'
 rootProject.name="VirtualApp"
